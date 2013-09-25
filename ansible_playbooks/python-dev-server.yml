@@ -17,12 +17,45 @@
   - name: install pip
     action: easy_install name=pip
 
-  - name: install various libraries with pip
+  - name: install various global libraries with pip
     action: pip name=$item state=present
     with_items:
       - virtualenv
       - supervisor
       - uwsgi
 
-  - name: start nginx
-    action: service name=nginx state=started enabled=yes
+  - name: create app virtualenv directory (can't be in VM shared folder)
+    action: file dest=/var/opt/python-virtualenvs/demoapp state=directory owner=vagrant group=vagrant mode=755
+
+  - name: install app dependencies into virtualenv
+    action: pip requirements=/var/opt/www/demoapp/requirements.txt virtualenv=/var/opt/python-virtualenvs/demoapp state=present
+
+  - name: create UWSGI log directory
+    action: file dest=/var/log/uwsgi state=directory owner=vagrant group=vagrant mode=755
+
+  - name: create supervisord config folder
+    action: file dest=/etc/supervisor state=directory owner=root
+
+  - name: create supervisord config
+    action: template src=templates/supervisord.conf dest=/etc/supervisord.conf
+
+  - name: create supervisord init script
+    action: template src=templates/supervisord.sh dest=/etc/init.d/supervisord mode=0755
+
+  - name: start supervisord service and have it run during system startup
+    action: service name=supervisord state=started enabled=yes
+
+  - name: symlink app supervisor ini file
+    action: file src=/var/opt/www/demoapp/demoapp_supervisor.ini dest=/etc/supervisor/demoapp.ini state=link 
+
+  - name: restart supervisord
+    action: service name=supervisord state=restarted enabled=yes
+
+  - name: remove default nginx site
+    action: file path=/etc/nginx/sites-enabled/default state=absent
+
+  - name: symlink app nginx config file
+    action: file src=/var/opt/www/demoapp/demoapp_nginx.conf dest=/etc/nginx/sites-enabled/demoapp_nginx.conf state=link
+
+  - name: restart nginx
+    action: service name=nginx state=restarted enabled=yes
