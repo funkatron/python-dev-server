@@ -2,6 +2,11 @@
 
 Builds a python development VM using vagrant and ansible.
 
+This was mostly put together to learn more about devops and automated deployment. The following articles were very useful:
+
+- [Flask/WSGI Application Deployment with Ubuntu, Ansible, Nginx, Supervisor and uWSGI](http://mattupstate.com/python/devops/2012/08/07/flask-wsgi-application-deployment-with-ubuntu-ansible-nginx-supervisor-and-uwsgi.html)
+- [Serving Flask With Nginx](http://vladikk.com/2013/09/12/serving-flask-with-nginx-on-ubuntu/)
+
 ## How do
 
 In theory, this is how you get it up and running:
@@ -12,6 +17,7 @@ In theory, this is how you get it up and running:
 4. Clone this repo into a directory of your choosing
 5. In that directory, do `vagrant up`
 6. In that same directory, do `./ansible_bootstrap.sh`
+7. Navigate to <http://192.168.33.88>. You should see "Hello World!"
 
 ## Caveats
 
