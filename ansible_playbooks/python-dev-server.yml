@@ -1,0 +1,28 @@
+---
+- hosts: python-dev-server
+  sudo: yes
+  tasks:
+
+  - name: update apt cache
+    apt: update-cache=yes cache_valid_time=3600
+
+  - name: install common packages needed for python application development
+    action: apt pkg=$item state=installed
+    with_items:
+      - python-dev
+      - python-setuptools
+      - git-core
+      - nginx
+
+  - name: install pip
+    action: easy_install name=pip
+
+  - name: install various libraries with pip
+    action: pip name=$item state=present
+    with_items:
+      - virtualenv
+      - supervisor
+      - uwsgi
+
+  - name: start nginx
+    action: service name=nginx state=started enabled=yes
